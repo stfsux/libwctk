@@ -40,7 +40,10 @@ typedef struct _wctk_textview
                                               t->width:t->parent->width-1-t->xpos)
 #define WCTK_TEXTVIEW_DRAW_HEIGHT(t)      ((WCTK_TEXTVIEW_DRAWABLE_HEIGHT(t)) ? \
                                               t->height:t->parent->height-1-t->ypos)
-
+#define WCTK_TEXTVIEW_HIT_TESTX(t,x)      ((x >= t->xpos)&&(x <= t->xpos+t->width))
+#define WCTK_TEXTVIEW_HIT_TESTY(t,y)      ((y >= t->ypos)&&(y <= t->ypos+t->height))
+#define WCTK_TEXTVIEW_HIT_TEST(t,x,y)     (WCTK_TEXTVIEW_HIT_TESTX(t,x) &&\
+                                           WCTK_TEXTVIEW_HIT_TESTY(t,y))
 
 pwctk_textview_t wctk_textview_create (char *txt, sint x, sint y,
     sint w, sint h, uchar flags, pwctk_window_t parent, uint uid);

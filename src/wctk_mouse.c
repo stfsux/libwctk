@@ -14,6 +14,7 @@ void
  wctk_mouse_init (void)
 {
   mousemask (ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION, NULL);
+  mouseinterval (1);
   fprintf (stdout, "\E[?1001s\E[?1003h");
   fflush (stdout);
 }
@@ -26,7 +27,7 @@ void
   {
     _g_wctk_xmouse = event->mevent.x;
     _g_wctk_ymouse = event->mevent.y;
-
+    
     if (event->mevent.bstate&BUTTON1_PRESSED)
     {
       if (event->window != NULL)
@@ -55,17 +56,17 @@ void
         if (wctk_window_region_bclose (event->window,
               _g_wctk_xmouse, _g_wctk_ymouse))
         {
-          event->event_type = WCTK_EVENT_CLOSE;
+          event->type = WCTK_EVENT_CLOSE;
         }
       }
     }
     
     if (_g_wctk_drag)
-      event->event_type = WCTK_EVENT_DRAG;
+      event->type = WCTK_EVENT_DRAG;
     else if (_g_wctk_resize)
-      event->event_type = WCTK_EVENT_RESIZE;
-    else if (event->event_type == 0)
-      event->event_type = WCTK_EVENT_MOUSE;
+      event->type = WCTK_EVENT_RESIZE;
+    else if (event->type == 0)
+      event->type = WCTK_EVENT_MOUSE;
   }
 }
 

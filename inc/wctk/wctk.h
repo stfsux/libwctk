@@ -8,6 +8,8 @@
 #include <wctk/wctk_draw.h>
 #include <wctk/wctk_window.h>
 #include <wctk/wctk_event.h>
+#include <wctk/wctk_mouse.h>
+#include <wctk/wctk_static_text.h>
 #include <wctk/wctk_button.h>
 #include <wctk/wctk_listview.h>
 #include <wctk/wctk_textview.h>
@@ -79,25 +81,6 @@
 #define WCTKC_CYAN_WHITE        63
 #define WCTKC_WHITE_WHITE       64
 #define WCTKC_MAX_PAIR          65
-
-/*
-typedef struct _wctk_widget
-{
-  void* widget;
-  unsigned int type;
-  struct _wctk_widget *next;
-  struct _wctk_widget *prev;
-}wctk_widget_t, *pwctk_widget_t;
-*/
-
-typedef struct _wctk_stack
-{
-  pwctk_window_t window;
-  struct _wctk_stack *next;
-  struct _wctk_stack *prev;
-}wctk_stack_t, *pwctk_stack_t;
-
-#include <wctk/wctk_mouse.h>
 
 
 #define WCTK_SCREEN_WIDTH        (stdscr->_maxx)

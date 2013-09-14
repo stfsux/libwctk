@@ -220,8 +220,27 @@ wctk_textview_colors_t
 };
 
 #define WINDOW_UID_MAIN         1
+#define WINDOW_UID_MAIN2        2
+#define WINDOW_UID_EVENT        3
 #define WIDGET_UID_TEXTVIEW     1
 #define NBTN                    4
+
+char *event_type[] = 
+{
+  "WCTK_EVENT_KEY",
+  "WCTK_EVENT_MOUSE",
+  "WCTK_EVENT_DRAG",
+  "WCTK_EVENT_RESIZE",
+  "WCTK_EVENT_CLOSE",
+  "WCTK_EVENT_BUTTON"
+};
+
+char *widget_type[] = 
+{
+  "BUTTON",
+  "TEXTVIEW",
+  "STATICTEXT"
+};
 
 int
  main (int argc, char *const argv[])
@@ -231,10 +250,13 @@ int
   pwctk_button_t btn[NBTN];
   pwctk_textview_t textview1 = NULL;
   pwctk_textview_t textview2 = NULL;
+  pwctk_window_t window3 = NULL;
+  pwctk_static_text_t statictxt = NULL;
   wctk_event_t ev;
   struct timeval c, s;
   unsigned int run = 1, i;
   char tmp[20];
+  char evdesc[256];
   (void)argc;
   (void)argv;
 
@@ -242,17 +264,21 @@ int
   wctk_setup_colors ();
 
   window1 = wctk_window_create ("Phrack introduction", 3, 3, 30, 15, WCTK_WINDOW,
-      WCTKC_WHITE_BLUE, WCTKC_WHITE_RED, WCTKC_WHITE_GREEN, WINDOW_UID_MAIN);
+      WINDOW_UID_MAIN);
   window2 = wctk_window_create ("Phrack Issue 1", 5, 5, 30, 15, WCTK_WINDOW,
-      WCTKC_WHITE_BLUE, WCTKC_WHITE_RED, WCTKC_WHITE_GREEN, WINDOW_UID_MAIN);
+      WINDOW_UID_MAIN2);
+  window3 = wctk_window_create ("Last event", 20, 10, 40, 10, WCTK_WINDOW_TOP, 
+      WINDOW_UID_EVENT);
   textview1 = wctk_textview_create (phrack_intro, 0, 0, 28, 5, 0,
       window1, WIDGET_UID_TEXTVIEW);
   textview2 = wctk_textview_create (phrack_issue1, 0, 0, 28, 13, WCTK_TEXTVIEW_HILINE,
       window2, WIDGET_UID_TEXTVIEW);
+  statictxt = wctk_static_text_create ("Wating a valid event...", 0, 0, 50, 10, window3);
+
   for (i = 0; i < NBTN; i++)
   {
     sprintf (tmp, "Button %i", i);
-    btn[i] = wctk_button_create (tmp, 1+i*12, 8, 10, 3, 0, window1);
+    btn[i] = wctk_button_create (tmp, 1+i*12, 8, 10, 3, 0, window1, i+1);
   }
 
   wctk_textview_set_colors (textview1, &tv_colors);
@@ -264,10 +290,10 @@ int
   {
     wctk_event_get (&ev);
     wctk_event_translate (&ev);
-    switch (ev.event_type)
+    switch (ev.type)
     {
       case WCTK_EVENT_KEY:
-        if (ev.key == 'q')
+        if (ev.data == 'q')
           run = 0;
         break;
 
@@ -287,12 +313,36 @@ int
 
     gettimeofday (&c, NULL);
   
-    if ((double)(c.tv_sec+c.tv_usec*0.000001)-
-        (double)(s.tv_sec+s.tv_usec*0.000001) > 0.250f)
+    if (ev.data != ERR)
     {
-      gettimeofday (&s, NULL);
+      pwctk_window_t window = wctk_zorder_get_first_window ();
+      if (window != NULL)
+      {
+        switch (ev.type)
+        {
+          case WCTK_EVENT_MOUSE:
+            sprintf (evdesc, "Event type: WCTK_EVENT_MOUSE\n"
+                             "x:          %d\n"
+                             "y:          %d\n"
+                             "pressed:    %s\n"
+                             "released:   %s\n",
+                             ev.mevent.x, ev.mevent.y,
+                             (ev.mevent.bstate&BUTTON1_PRESSED)?"true":"false",
+                             (ev.mevent.bstate&BUTTON1_RELEASED)?"true":"false");
+            break;
+
+          default:
+            sprintf (evdesc, "Event type:          %s\n"
+                         "Data:                0x%08X\n"
+                         "Focused window:      %s\n"
+                         "Focused widget type: %s",
+                         event_type[ev.type-1], ev.data, window->title,
+                         widget_type[window->widget_focus->type-1]);
+            break;
+        }
+        wctk_static_text_set (statictxt, evdesc);
+      }
     }
-    
     wctk_draw_rect_fill (0, 0, WCTK_SCREEN_WIDTH+1, WCTK_SCREEN_HEIGHT+1,
         ACS_CKBOARD|COLOR_PAIR(WCTKC_BLUE_WHITE));
     wctk_refresh ();
@@ -300,6 +350,7 @@ int
 
   wctk_window_destroy (window1);
   wctk_window_destroy (window2);
+  wctk_window_destroy (window3);
   wctk_quit ();
   return 0;
 }

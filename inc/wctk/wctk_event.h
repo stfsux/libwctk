@@ -4,17 +4,15 @@
 
 typedef struct _wctk_event
 {
-  void *widget;
-  unsigned int widget_uid;
-  unsigned int widget_type;
-  unsigned int event_type;
-#define WCTK_EVENT_MOUSE   1
-#define WCTK_EVENT_KEY     2
+  unsigned int type;
+#define WCTK_EVENT_KEY     1
+#define WCTK_EVENT_MOUSE   2
 #define WCTK_EVENT_DRAG    3
 #define WCTK_EVENT_RESIZE  4
 #define WCTK_EVENT_CLOSE   5
+#define WCTK_EVENT_BUTTON  6
   pwctk_window_t window;
-  int key;
+  int data;
   MEVENT mevent;
 }wctk_event_t, *pwctk_event_t;
 

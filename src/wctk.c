@@ -4,8 +4,6 @@
 #include <locale.h>
 #include "wctk/wctk.h"
 
-pwctk_stack_t stack = NULL;
-
 /*-----------------------------------------------------------------*/
 void
  wctk_init (void)
@@ -18,8 +16,6 @@ void
   nonl ();
   raw ();
   keypad (stdscr, TRUE);
-  mousemask (ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION, NULL);
-  mouseinterval (1);
   timeout (0);
   wctk_mouse_init ();
 }
@@ -46,22 +42,20 @@ void
 void
  wctk_event_get (pwctk_event_t event)
 {
-  int data = 0;
+  int key = 0;
   memset (event, 0x00, sizeof(wctk_event_t));
   event->window = wctk_zorder_get_first_window ();
   wctk_window_set_focus (event->window, 1);
-  data = getch ();
-  if (data == ERR)
-    return;
-  switch (data)
+  key = getch ();
+  switch (key)
   {
     case KEY_MOUSE:
       wctk_mouse_event (event);
       break;
 
     default:
-      event->event_type = WCTK_EVENT_KEY;
-      event->key = data;
+      event->type = WCTK_EVENT_KEY;
+      event->data = key;
       break;
   }
 }
@@ -70,28 +64,29 @@ void
 void
  wctk_event_translate (pwctk_event_t event)
 {
-  switch (event->event_type)
+  switch (event->type)
   {
     case WCTK_EVENT_MOUSE:
-      if (wctk_mouse_released (event))
+      if (event->window != NULL)
       {
-        pwctk_zorder_t zwin = wctk_zorder_get (event->mevent.x, event->mevent.y);
-        if (zwin != NULL)
+        if (wctk_mouse_released (event))
         {
-          if (zwin != wctk_zorder_get_first ())
+          pwctk_zorder_t zwin = wctk_zorder_get (event->mevent.x, event->mevent.y);
+          if (zwin != NULL)
           {
-            pwctk_window_t win = zwin->window;
-            wctk_window_set_focus (wctk_zorder_get_first_window (), 0);
-            wctk_zorder_pop_target (zwin);
-            wctk_zorder_push (win);
-            event->window = wctk_zorder_get_first_window ();
+            if (zwin != wctk_zorder_get_first ())
+            {
+              pwctk_window_t win = zwin->window;
+              wctk_window_set_focus (wctk_zorder_get_first_window (), 0);
+              wctk_zorder_pop_target (zwin);
+              wctk_zorder_push (win);
+              event->window = wctk_zorder_get_first_window ();
+            }
           }
         }
       }
-      else
-      {
-        /* Transmit event to the widget. */
-      }
+      /* Transmit event(s) to all widget(s) of the focused window. */
+      wctk_widget_event_translate_all (event->window, event);
       break;
 
     case WCTK_EVENT_DRAG:
@@ -119,23 +114,25 @@ void
       break;
 
     case WCTK_EVENT_KEY:
-      switch (event->key)
+      switch (event->data)
       {
         case '\t':
-          if (!wctk_widget_focus_next (event->window) &&
-              event->window != NULL)
+          if (event->window != NULL)
           {
-            pwctk_window_t win = wctk_zorder_get_first_window ();
-            if (win != NULL)
+            if (!wctk_widget_focus_next (event->window))
             {
-              win->widget_focus = win->widget_list;
-              wctk_window_set_focus (win, 0);
-              wctk_zorder_switch_next_window ();
+              pwctk_window_t win = wctk_zorder_get_first_window ();
+              if (win != NULL)
+              {
+                win->widget_focus = win->widget_list;
+                wctk_window_set_focus (win, 0);
+                wctk_zorder_switch_next_window ();
+              }
             }
           }
           break;
       }
-      /* Tansmit event to the widget. */
+      /* Tansmit event to the focused widget. */
       wctk_widget_event_translate (event->window, event);
       break;
   }

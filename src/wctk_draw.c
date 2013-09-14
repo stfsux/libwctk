@@ -76,7 +76,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_draw_modify_cpair (sint x, sint y, short cpair)
+ wctk_draw_set_cpair (sint x, sint y, short cpair)
 {
   chtype ch = 0;
   ch = mvinch (y, x);

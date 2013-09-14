@@ -12,7 +12,8 @@ void
     return;
 
   if (type != WCTKW_TEXTVIEW &&
-      type != WCTKW_BUTTON)
+      type != WCTKW_BUTTON   &&
+      type != WCTKW_STATICTEXT)
     return;
 
   new_widget = calloc (1, sizeof(wctk_widget_t));
@@ -39,23 +40,70 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_widget_event_translate (pwctk_window_t parent,
+ wctk_widget_event_translate_all (pwctk_window_t parent,
      pwctk_event_t event)
 {
+  pwctk_widget_t widget = NULL;
+
   if (parent == NULL ||
       event  == NULL)
     return;
-
-  if (parent->widget_focus != NULL)
+  
+  widget = parent->widget_list;
+  
+  while (widget != NULL)
   {
-    switch (parent->widget_focus->type)
+    switch (widget->type)
     {
       case WCTKW_TEXTVIEW:
           wctk_textview_event_translate (
-              WCTK_WIDGET_TEXTVIEW(parent->widget_focus->widget),
-              event);
+              WCTK_WIDGET_TEXTVIEW(widget->widget),
+              event
+              );
+          break;
+
+      case WCTKW_BUTTON:
+          wctk_button_event_translate (
+              WCTK_WIDGET_BUTTON(widget->widget),
+              event
+              );
           break;
     }
+    widget = widget->next;
+  }
+}
+
+/*-----------------------------------------------------------------*/
+void
+ wctk_widget_event_translate (pwctk_window_t parent,
+     pwctk_event_t event)
+{
+  pwctk_widget_t widget = NULL;
+
+  if (parent == NULL ||
+      event  == NULL)
+    return;
+  
+  widget = parent->widget_focus;
+
+  if (widget == NULL)
+    return;
+  
+  switch (widget->type)
+  {
+    case WCTKW_TEXTVIEW:
+        wctk_textview_event_translate (
+            WCTK_WIDGET_TEXTVIEW(widget->widget),
+            event
+            );
+        break;
+
+    case WCTKW_BUTTON:
+        wctk_button_event_translate (
+            WCTK_WIDGET_BUTTON(widget->widget),
+            event
+            );
+        break;
   }
 }
 
@@ -86,19 +134,34 @@ void
 uchar
  wctk_widget_focus_next (pwctk_window_t window)
 {
+  pwctk_widget_t widget = NULL;
+
   if (window == NULL)
     return 0;
 
   if (window->widget_focus == NULL)
     return 0;
 
-  wctk_widget_set_focus (window->widget_focus, 0);
-  if (window->widget_focus->next != NULL)
-    window->widget_focus = window->widget_focus->next;
+  widget = window->widget_focus;
+
+  wctk_widget_set_focus (widget, 0);
+
+  if (widget->next != NULL)
+    widget = widget->next;
   else
     return 0;
-  wctk_widget_set_focus (window->widget_focus, 1);
-  return 1;
+
+  while (widget != NULL)
+  {
+    if (widget->type != WCTKW_STATICTEXT)
+    {
+      window->widget_focus = widget;
+      wctk_widget_set_focus (window->widget_focus, 1);
+      return 1;
+    }
+    widget = widget->next;
+  }
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -149,10 +212,72 @@ void
             );
         }
         break;
+
+      case WCTKW_STATICTEXT:
+        if (WCTK_STATICTEXT_DRAWABLE(WCTK_WIDGET_STATICTEXT(widget->widget)))
+        {
+          wctk_static_text_draw
+            (
+              WCTK_WIDGET_STATICTEXT(widget->widget),
+              WCTK_STATICTEXT_DRAW_WIDTH (
+                WCTK_WIDGET_STATICTEXT(widget->widget)
+              ),
+              WCTK_STATICTEXT_DRAW_HEIGHT (
+                WCTK_WIDGET_STATICTEXT(widget->widget)
+              )
+            );
+        }
+        break;
     }
     widget = widget->next;
   }
 }
+
+/*-----------------------------------------------------------------*/
+/*
+uchar
+ wctk_widget_hit (pwctk_widget_t widget, sint x, sint y)
+{
+  uchar r = 0;
+
+  if (widget == NULL)
+    return 0;
+
+  switch (widget->type)
+  {
+    case WCTKW_TEXTVIEW:
+      if (WCTK_TEXTVIEW_HIT_TEST(WCTK_WIDGET_TEXTVIEW(widget->widget)))
+        r = 1;
+      break;
+
+    case WCTKW_BUTTON:
+      if (WCTK_BUTTON_HIT_TEST(WCTK_WIDGET_BUTTON(widget->widget)))
+        r = 1;
+      break;
+  }
+
+  return r;
+}
+*/
+
+/*-----------------------------------------------------------------*/
+/*
+pwctk_widget_t
+ wctk_widget_hit_region (pwctk_window_t parent, sint x, sint y)
+{
+  pwctk_widget_t ptr = NULL;
+  if (parent == NULL)
+    return NULL;
+  ptr = parent->widget_list;
+  while (ptr != NULL)
+  {
+    if (wctk_widget_hit (ptr, x, y))
+      return ptr;
+    ptr = ptr->next;
+  }
+  return NULL;
+}
+*/
 
 /*-----------------------------------------------------------------*/
 void

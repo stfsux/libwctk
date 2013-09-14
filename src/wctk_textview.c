@@ -102,13 +102,13 @@ void
         {
           if (textview->state&WCTK_TEXTVIEW_STATE_FOCUS)
           {
-            wctk_draw_modify_cpair (textview->xpos + textview->parent->xpos + i,
+            wctk_draw_set_cpair (textview->xpos + textview->parent->xpos + i,
                 textview->ypos + textview->parent->ypos + textview->ycursor,
                 textview->colors.focus_hline_cpair);
           }
           else
           {
-            wctk_draw_modify_cpair (textview->xpos + textview->parent->xpos + i,
+            wctk_draw_set_cpair (textview->xpos + textview->parent->xpos + i,
                 textview->ypos + textview->parent->ypos + textview->ycursor,
                 textview->colors.default_hline_cpair);
           }
@@ -131,10 +131,10 @@ size_t
 void
  wctk_textview_event_translate (pwctk_textview_t textview, pwctk_event_t event)
 {
-  switch (event->event_type)
+  switch (event->type)
   {
     case WCTK_EVENT_KEY:
-      switch (event->key)
+      switch (event->data)
       {
         case KEY_LEFT:
           if (textview->xcursor != 0)

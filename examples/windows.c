@@ -27,7 +27,7 @@ int
   {
     char tmp[MAX_WINDOW];
     sprintf (tmp, "Window %u!", i);
-    window[i] = wctk_window_create (tmp, 1+i*2, 1+i*2, 20, 10, WCTK_WINDOW, WCTKC_WHITE_BLUE, WCTKC_WHITE_RED, WCTKC_WHITE_GREEN, i+1);
+    window[i] = wctk_window_create (tmp, 1+i*2, 1+i*2, 20, 10, WCTK_WINDOW, i+1);
   }
   gettimeofday (&s, NULL);
   gettimeofday (&tv_fps, NULL);
@@ -35,12 +35,12 @@ int
   {
     wctk_event_get (&ev);
     wctk_event_translate (&ev);
-    switch (ev.event_type)
+    switch (ev.type)
     {
       case WCTK_EVENT_KEY:
-        if (ev.key == 'q')
+        if (ev.data == 'q')
           run = 0;
-        else if (ev.key == ' ')
+        else if (ev.data == ' ')
           rot = rot ^ 1;
         break;
     }
@@ -55,7 +55,7 @@ int
         if (rot == 1)
         wctk_window_move (window[i], x, y);
       }
-      wctk_draw_rect_fill (0, 0, WCTK_SCREEN_WIDTH+1, WCTK_SCREEN_HEIGHT+1, ACS_CKBOARD|COLOR_PAIR(WCTKC_BLUE_WHITE));
+      wctk_draw_rect_fill (0, 0, WCTK_SCREEN_WIDTH+1, WCTK_SCREEN_HEIGHT+1, ' '|COLOR_PAIR(WCTKC_BLUE_YELLOW));
       mvprintw (0,0, "%3d fps", fps);
       wctk_refresh ();
       gettimeofday (&s, NULL);
@@ -68,8 +68,6 @@ int
       frame = 0;
       gettimeofday (&tv_fps, NULL);
     }
-    //wctk_draw_rect_fill (0, 0, WCTK_SCREEN_WIDTH+1, WCTK_SCREEN_HEIGHT+1, ' '|COLOR_PAIR(WCTKC_BLUE_WHITE));
-    //wctk_refresh ();
   }
   for (i = 0; i < MAX_WINDOW; i++)
     wctk_window_destroy (window[i]);

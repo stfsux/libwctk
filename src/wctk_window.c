@@ -7,8 +7,7 @@
 /*-----------------------------------------------------------------*/
 pwctk_window_t
  wctk_window_create (char* title, sint x, sint y, sint w, sint h,
-     uchar flags, short default_cpair, short titlebar_cpair,
-     short focused_cpair, uint uid)
+     uchar flags, uint uid)
 {
   pwctk_window_t window = NULL;
   if (w  <= 2 ||
@@ -34,12 +33,24 @@ pwctk_window_t
   window->width         = w;
   window->height        = h;
   window->flags         = flags;
-  window->default_cpair = default_cpair;
-  window->titlebar_cpair= titlebar_cpair;
-  window->focused_cpair = focused_cpair;
+  window->colors.default_cpair = WCTKC_WHITE_BLUE;
+  window->colors.titlebar_cpair= WCTKC_WHITE_CYAN;
+  window->colors.focused_cpair = WCTKC_WHITE_RED;
   window->uid           = uid;
   wctk_zorder_push (window);
   return window;
+}
+
+/*-----------------------------------------------------------------*/
+void
+ wctk_window_set_colors (pwctk_window_t window, 
+     pwctk_window_colors_t colors)
+{
+  if (window == NULL ||
+      colors == NULL)
+    return;
+
+  memcpy (&window->colors, colors, sizeof(wctk_window_colors_t));
 }
 
 /*-----------------------------------------------------------------*/
@@ -52,39 +63,39 @@ void
   if (window->state&WCTK_WINDOW_STATE_FOCUS)
   {
     wctk_draw_rect_fill (window->xpos, window->ypos, window->width, 1,
-      ' '|COLOR_PAIR(window->focused_cpair));
-    attr_on (COLOR_PAIR(window->focused_cpair), NULL);
+      ' '|COLOR_PAIR(window->colors.focused_cpair));
+    attr_on (COLOR_PAIR(window->colors.focused_cpair), NULL);
   }
   else
   {
     wctk_draw_rect_fill (window->xpos, window->ypos, window->width, 1,
-      ' '|COLOR_PAIR(window->titlebar_cpair));
-    attr_on (COLOR_PAIR(window->titlebar_cpair), NULL);
+      ' '|COLOR_PAIR(window->colors.titlebar_cpair));
+    attr_on (COLOR_PAIR(window->colors.titlebar_cpair), NULL);
   }
   mvprintw (window->ypos, window->xpos+1, "%s", window->title);
   mvprintw (window->ypos, window->xpos+window->width-9, "[.][o][x]");
   if (window->state&WCTK_WINDOW_STATE_FOCUS)
-    attr_off (COLOR_PAIR(window->focused_cpair), NULL);
+    attr_off (COLOR_PAIR(window->colors.focused_cpair), NULL);
   else
-    attr_off (COLOR_PAIR(window->default_cpair), NULL);
+    attr_off (COLOR_PAIR(window->colors.default_cpair), NULL);
 
   /* Draw window. */
   wctk_draw_rect_fill (window->xpos, window->ypos+1, window->width,
-    window->height-1, ' '|COLOR_PAIR(window->default_cpair));
+    window->height-1, ' '|COLOR_PAIR(window->colors.default_cpair));
 
   /* Draw vertical and horizontal lines. */
-  wctk_draw_vline (window->xpos, window->ypos+1, window->height-1, window->default_cpair);
-  wctk_draw_vline (window->xpos+window->width-1, window->ypos+1, window->height-2, window->default_cpair);
-  wctk_draw_hline (window->xpos, window->ypos+window->height-1, window->width-1, window->default_cpair);
+  wctk_draw_vline (window->xpos, window->ypos+1, window->height-1, window->colors.default_cpair);
+  wctk_draw_vline (window->xpos+window->width-1, window->ypos+1, window->height-2, window->colors.default_cpair);
+  wctk_draw_hline (window->xpos, window->ypos+window->height-1, window->width-1, window->colors.default_cpair);
 
   /* Draw widgets. */
   wctk_widget_draw (window);
   
   /* Draw corners. */
   mvaddch (window->ypos+window->height-1, window->xpos+window->width-1,
-      ACS_LRCORNER|COLOR_PAIR(window->default_cpair));
+      ACS_LRCORNER|COLOR_PAIR(window->colors.default_cpair));
   mvaddch (window->ypos+window->height-1, window->xpos,
-      ACS_LLCORNER|COLOR_PAIR(window->default_cpair));
+      ACS_LLCORNER|COLOR_PAIR(window->colors.default_cpair));
 
   /* Drop shadow. */
   wctk_draw_shadow (window->xpos, window->ypos, window->width, window->height);
@@ -175,13 +186,14 @@ uchar
 
 /*-----------------------------------------------------------------*/
 void
- wctk_window_destroy (pwctk_window_t window)
+ wctk_window_destroy_safe (pwctk_window_t *window)
 {
-  if (window != NULL)
+  if (*window != NULL)
   {
-    if (window->title != NULL)
-      free (window->title);
-    wctk_widget_destroy (window);
-    free (window);
+    if ((*window)->title != NULL)
+      free ((*window)->title);
+    wctk_widget_destroy (*window);
+    free (*window);
+    *window = NULL;
   }
 }
