@@ -12,6 +12,7 @@ STATIC_BINARIES = no
 
 CC				= gcc
 AR				= ar
+RANLIB		= ranlib
 MAKE			= make
 MKDIR     = mkdir
 CP        = cp
