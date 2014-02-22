@@ -1,0 +1,9 @@
+*~
+*.swp
+*.swo
+*.o
+lib/libwctk.a
+examples/textview 
+examples/windows 
+examples/prompt 
+
