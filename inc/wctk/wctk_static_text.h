@@ -5,10 +5,10 @@
 typedef struct _wctk_static_text
 {
   char *text;
-  sint xpos;
-  sint ypos;
-  sint width;
-  sint height;
+  int32_t xpos;
+  int32_t ypos;
+  int32_t width;
+  int32_t height;
   pwctk_window_t parent;
   short default_cpair;
 }wctk_static_text_t, *pwctk_static_text_t;
@@ -22,11 +22,12 @@ typedef struct _wctk_static_text
 #define WCTK_STATICTEXT_DRAW_HEIGHT(s)      ((WCTK_STATICTEXT_DRAWABLE_HEIGHT(s)) ? \
                                               s->height:s->parent->height-1-s->ypos)
 
-pwctk_static_text_t wctk_static_text_create (char *txt, sint x, sint y,
-    sint w, sint h, pwctk_window_t parent);
+pwctk_static_text_t wctk_static_text_create (char *txt, int32_t x, int32_t y,
+    int32_t width, int32_t height, pwctk_window_t parent);
 void wctk_static_text_set (pwctk_static_text_t st, char *txt);
-void wctk_static_text_draw (pwctk_static_text_t st, sint w, sint h);
-void wctk_static_text_move (pwctk_static_text_t st, sint x, sint y);
+void wctk_static_text_draw (pwctk_static_text_t st, int32_t w, int32_t h);
+void wctk_static_text_move (pwctk_static_text_t st, int32_t x, int32_t y);
+void wctk_static_text_resize (pwctk_static_text_t st, int32_t width, int32_t height);
 void wctk_static_text_destroy (pwctk_static_text_t st);
 
 #endif

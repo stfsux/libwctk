@@ -3,7 +3,7 @@ include config.mk
 all: $(LIBSTATIC) $(EXAMPLES)
 
 uninstall:
-	$(RM) -fv $(PREFIX)/lib/$(LIBSTATIC) $(PREFIX)/include/wctk
+	$(RM) -f $(PREFIX)/lib/$(LIBSTATIC) $(PREFIX)/include/wctk
 
 install: $(LIBSTATIC)
 	$(CP) -vr $(LIBDIR)/$(LIBSTATIC) $(PREFIX)/lib
@@ -26,7 +26,8 @@ $(LIBDIR):
 
 clean:
 	@(cd $(EXAMPLES) && $(MAKE) clean)
-	rm -vf $(LIBDIR)/*
-	rm -vf $(SRCDIR)/*.o
+	rm -f $(LIBDIR)/*
+	rm -f $(SRCDIR)/*.o
 
 .PHONY: clean
+

@@ -2,12 +2,13 @@
 #include <stdio.h>
 #include "wctk/wctk.h"
 
-sint _g_wctk_xmouse = 0;
-sint _g_wctk_ymouse = 0;
-sint _g_wctk_click_sx = 0;
-sint _g_wctk_click_sy = 0;
-uchar _g_wctk_drag    = 0;
-uchar _g_wctk_resize = 0;
+int32_t _g_wctk_xmouse = 0;
+int32_t _g_wctk_ymouse = 0;
+int32_t _g_wctk_click_sx = 0;
+int32_t _g_wctk_click_sy = 0;
+uint8_t _g_wctk_drag    = 0;
+uint8_t _g_wctk_resize = 0;
+uint8_t _g_wctk_mouse_enable = 0;
 
 /*-----------------------------------------------------------------*/
 void
@@ -17,6 +18,42 @@ void
   mouseinterval (1);
   fprintf (stdout, "\E[?1001s\E[?1003h");
   fflush (stdout);
+  wctk_mouse_enable ();
+}
+
+/*-----------------------------------------------------------------*/
+void
+ wctk_mouse_enable (void)
+{
+  _g_wctk_mouse_enable = 1;
+}
+
+/*-----------------------------------------------------------------*/
+void
+ wctk_mouse_disable (void)
+{
+  _g_wctk_mouse_enable = 0;
+}
+
+/*-----------------------------------------------------------------*/
+uint8_t
+ wctk_has_mouse (void)
+{
+  return _g_wctk_mouse_enable;
+}
+
+/*-----------------------------------------------------------------*/
+void
+ wctk_mouse_drag_disable (void)
+{
+  _g_wctk_drag = 0;
+}
+
+/*-----------------------------------------------------------------*/
+void
+ wctk_mouse_resize_disable (void)
+{
+  _g_wctk_resize = 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -33,7 +70,8 @@ void
       if (event->window != NULL)
       {
         if (wctk_window_region_titlebar (event->window,
-              _g_wctk_xmouse, _g_wctk_ymouse))
+              _g_wctk_xmouse, _g_wctk_ymouse) &&
+            !(wctk_window_get_state (event->window)&WCTK_WINDOW_STATE_MAXIMIZE))
         {
           _g_wctk_drag = 1;
           _g_wctk_click_sx = _g_wctk_xmouse - event->window->xpos;
@@ -58,6 +96,16 @@ void
         {
           event->type = WCTK_EVENT_CLOSE;
         }
+        else if (wctk_window_region_bmax (event->window,
+              _g_wctk_xmouse, _g_wctk_ymouse))
+        {
+          event->type = WCTK_EVENT_MAXIMIZE;
+        }
+        else if (wctk_window_region_bmin (event->window,
+              _g_wctk_xmouse, _g_wctk_ymouse))
+        {
+          event->type = WCTK_EVENT_MINIMIZE;
+        }
       }
     }
     
@@ -71,42 +119,42 @@ void
 }
 
 /*-----------------------------------------------------------------*/
-uchar
+uint8_t
  wctk_mouse_pressed (pwctk_event_t event)
 {
   return (event->mevent.bstate&BUTTON1_PRESSED)?1:0;
 }
 
 /*-----------------------------------------------------------------*/
-uchar
+uint8_t
  wctk_mouse_released (pwctk_event_t event)
 {
   return (event->mevent.bstate&BUTTON1_RELEASED)?1:0;
 }
 
 /*-----------------------------------------------------------------*/
-sint
+int32_t
  wctk_mouse_getx (void)
 {
   return _g_wctk_xmouse;
 }
 
 /*-----------------------------------------------------------------*/
-sint
+int32_t
  wctk_mouse_gety (void)
 {
   return _g_wctk_ymouse;
 }
 
 /*-----------------------------------------------------------------*/
-sint
+int32_t
  wctk_mouse_getsx (void)
 {
   return _g_wctk_click_sx;
 }
 
 /*-----------------------------------------------------------------*/
-sint
+int32_t
  wctk_mouse_getsy (void)
 {
   return _g_wctk_click_sy;

@@ -4,16 +4,17 @@
 /*-----------------------------------------------------------------*/
 void
  wctk_widget_attach (pwctk_window_t parent, void *widget,
-     uint type)
+     uint32_t type)
 {
   pwctk_widget_t new_widget = NULL;
 
   if (parent == NULL)
     return;
 
-  if (type != WCTKW_TEXTVIEW &&
-      type != WCTKW_BUTTON   &&
-      type != WCTKW_STATICTEXT)
+  if (type != WCTKW_LISTVIEW   &&
+      type != WCTKW_BUTTON     &&
+      type != WCTKW_STATICTEXT &&
+      type != WCTKW_PROMPT)
     return;
 
   new_widget = calloc (1, sizeof(wctk_widget_t));
@@ -26,13 +27,19 @@ void
   if (parent->widget_list == NULL)
   {
     parent->widget_list = new_widget;
-    parent->widget_focus = parent->widget_list;
+    if (new_widget->type != WCTKW_STATICTEXT)
+      parent->widget_focus = new_widget;
   }
   else
   {
     pwctk_widget_t ptr = parent->widget_list;
     while (ptr->next != NULL)
       ptr = ptr->next;
+    if (parent->widget_focus == NULL)
+    {
+      if (new_widget->type != WCTKW_STATICTEXT)
+        parent->widget_focus = new_widget;
+    }
     ptr->next = new_widget;
     new_widget->prev = ptr;
   }
@@ -55,11 +62,13 @@ void
   {
     switch (widget->type)
     {
-      case WCTKW_TEXTVIEW:
-          wctk_textview_event_translate (
-              WCTK_WIDGET_TEXTVIEW(widget->widget),
+      case WCTKW_LISTVIEW:
+        /*
+          wctk_listview_event_translate (
+              WCTK_WIDGET_LISTVIEW(widget->widget),
               event
               );
+              */
           break;
 
       case WCTKW_BUTTON:
@@ -91,9 +100,9 @@ void
   
   switch (widget->type)
   {
-    case WCTKW_TEXTVIEW:
-        wctk_textview_event_translate (
-            WCTK_WIDGET_TEXTVIEW(widget->widget),
+    case WCTKW_LISTVIEW:
+        wctk_listview_event_translate (
+            WCTK_WIDGET_LISTVIEW(widget->widget),
             event
             );
         break;
@@ -104,21 +113,28 @@ void
             event
             );
         break;
+
+    case WCTKW_PROMPT:
+        wctk_prompt_event_translate (
+            WCTK_WIDGET_PROMPT(widget->widget),
+            event
+            );
+        break;
   }
 }
 
 /*-----------------------------------------------------------------*/
 void
- wctk_widget_set_focus (pwctk_widget_t widget, uchar b)
+ wctk_widget_set_focus (pwctk_widget_t widget, uint8_t b)
 {
   if (widget == NULL)
     return;
 
   switch (widget->type)
   {
-    case WCTKW_TEXTVIEW:
-      wctk_textview_set_focus (
-          WCTK_WIDGET_TEXTVIEW(widget->widget), b
+    case WCTKW_LISTVIEW:
+      wctk_listview_set_focus (
+          WCTK_WIDGET_LISTVIEW(widget->widget), b
           );
       break;
 
@@ -127,11 +143,17 @@ void
           WCTK_WIDGET_BUTTON(widget->widget), b
           );
       break;
+
+    case WCTKW_PROMPT:
+      wctk_prompt_set_focus (
+          WCTK_WIDGET_PROMPT(widget->widget), b
+          );
+      break;
   }
 }
 
 /*-----------------------------------------------------------------*/
-uchar
+uint8_t
  wctk_widget_focus_next (pwctk_window_t window)
 {
   pwctk_widget_t widget = NULL;
@@ -146,10 +168,7 @@ uchar
 
   wctk_widget_set_focus (widget, 0);
 
-  if (widget->next != NULL)
-    widget = widget->next;
-  else
-    return 0;
+  widget = widget->next;
 
   while (widget != NULL)
   {
@@ -168,10 +187,21 @@ uchar
 void
  wctk_widget_focus_first (pwctk_window_t window)
 {
+  pwctk_widget_t widget = NULL;
   if (window == NULL)
     return;
   wctk_widget_set_focus (window->widget_focus, 0);
-  window->widget_focus = window->widget_list;
+  widget = window->widget_list;
+  window->widget_focus = NULL;
+  while (widget != NULL)
+  {
+    if (widget->type != WCTKW_STATICTEXT)
+    {
+      window->widget_focus = widget;
+      break;
+    }
+    widget = widget->next;
+  }
   wctk_widget_set_focus (window->widget_focus, 1);
 }
 
@@ -189,18 +219,6 @@ void
   {
     switch (widget->type)
     {
-      case WCTKW_TEXTVIEW:
-        if (WCTK_TEXTVIEW_DRAWABLE(WCTK_WIDGET_TEXTVIEW(widget->widget)))
-        {
-          wctk_textview_draw 
-            (
-              WCTK_WIDGET_TEXTVIEW(widget->widget),
-              WCTK_TEXTVIEW_DRAW_WIDTH(WCTK_WIDGET_TEXTVIEW(widget->widget)),
-              WCTK_TEXTVIEW_DRAW_HEIGHT(WCTK_WIDGET_TEXTVIEW(widget->widget))
-            );
-        }
-        break;
-
       case WCTKW_BUTTON:
         if (WCTK_BUTTON_DRAWABLE(WCTK_WIDGET_BUTTON(widget->widget)))
         {
@@ -209,6 +227,18 @@ void
               WCTK_WIDGET_BUTTON(widget->widget),
               WCTK_BUTTON_DRAW_WIDTH(WCTK_WIDGET_BUTTON(widget->widget)),
               WCTK_BUTTON_DRAW_HEIGHT(WCTK_WIDGET_BUTTON(widget->widget))
+            );
+        }
+        break;
+
+      case WCTKW_LISTVIEW:
+        if (WCTK_LISTVIEW_DRAWABLE(WCTK_WIDGET_LISTVIEW(widget->widget)))
+        {
+          wctk_listview_draw 
+            (
+              WCTK_WIDGET_LISTVIEW(widget->widget),
+              WCTK_LISTVIEW_DRAW_WIDTH(WCTK_WIDGET_LISTVIEW(widget->widget)),
+              WCTK_LISTVIEW_DRAW_HEIGHT(WCTK_WIDGET_LISTVIEW(widget->widget))
             );
         }
         break;
@@ -228,6 +258,19 @@ void
             );
         }
         break;
+
+      case WCTKW_PROMPT:
+        if (WCTK_PROMPT_DRAWABLE(WCTK_WIDGET_PROMPT(widget->widget)))
+        {
+          wctk_prompt_draw
+            (
+              WCTK_WIDGET_PROMPT(widget->widget),
+              WCTK_PROMPT_DRAW_WIDTH (
+                WCTK_WIDGET_PROMPT(widget->widget)
+              )
+            );
+        }
+        break;
     }
     widget = widget->next;
   }
@@ -235,18 +278,18 @@ void
 
 /*-----------------------------------------------------------------*/
 /*
-uchar
- wctk_widget_hit (pwctk_widget_t widget, sint x, sint y)
+uint8_t
+ wctk_widget_hit (pwctk_widget_t widget, int32_t x, int32_t y)
 {
-  uchar r = 0;
+  uint8_t r = 0;
 
   if (widget == NULL)
     return 0;
 
   switch (widget->type)
   {
-    case WCTKW_TEXTVIEW:
-      if (WCTK_TEXTVIEW_HIT_TEST(WCTK_WIDGET_TEXTVIEW(widget->widget)))
+    case WCTKW_LISTVIEW:
+      if (WCTK_LISTVIEW_HIT_TEST(WCTK_WIDGET_LISTVIEW(widget->widget)))
         r = 1;
       break;
 
@@ -263,7 +306,7 @@ uchar
 /*-----------------------------------------------------------------*/
 /*
 pwctk_widget_t
- wctk_widget_hit_region (pwctk_window_t parent, sint x, sint y)
+ wctk_widget_hit_region (pwctk_window_t parent, int32_t x, int32_t y)
 {
   pwctk_widget_t ptr = NULL;
   if (parent == NULL)
@@ -290,16 +333,26 @@ void
     fptr = ptr;
     switch (fptr->type)
     {
-      case WCTKW_TEXTVIEW:
-        wctk_textview_destroy (WCTK_WIDGET_TEXTVIEW(fptr->widget));
-        break;
-
       case WCTKW_BUTTON:
         wctk_button_destroy (WCTK_WIDGET_BUTTON(fptr->widget));
+        break;
+
+      case WCTKW_LISTVIEW:
+        wctk_listview_destroy (WCTK_WIDGET_LISTVIEW(fptr->widget));
+        break;
+
+      case WCTKW_STATICTEXT:
+        wctk_static_text_destroy (WCTK_WIDGET_STATICTEXT(fptr->widget));
+        break;
+
+      case WCTKW_PROMPT:
+        wctk_prompt_destroy (WCTK_WIDGET_PROMPT(fptr->widget));
         break;
     }
     ptr = ptr->next;
     free (fptr);
+    fptr = NULL;
   }
+  parent->widget_list = NULL;
 }
 

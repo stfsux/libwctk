@@ -5,10 +5,11 @@
 typedef struct _wctk_widget
 {
   void *widget;
-  uint type;
+  uint32_t type;
 #define WCTKW_BUTTON     1
-#define WCTKW_TEXTVIEW   2
+#define WCTKW_LISTVIEW   2
 #define WCTKW_STATICTEXT 3
+#define WCTKW_PROMPT     4
   struct _wctk_widget *next;
   struct _wctk_widget *prev;
 }wctk_widget_t, *pwctk_widget_t;
@@ -23,44 +24,54 @@ typedef struct _wctk_window_colors
 typedef struct _wctk_window
 {
   char *title;
-  sint xpos;
-  sint ypos;
-  sint xoffset;
-  sint yoffset;
-  sint width;
-  sint height;
-  sint flags;
-#define WCTK_WINDOW           0
-#define WCTK_WINDOW_NOCLOSE  (1<<0)
-#define WCTK_WINDOW_NOMAX    (1<<1)
-#define WCTK_WINDOW_NOMIN    (1<<2)
-#define WCTK_WINDOW_TOP      (1<<3)
-  uchar state;
-#define WCTK_WINDOW_STATE_FOCUS   (1<<0)
-#define WCTK_WINDOW_STATE_DISABLE (1<<1)
+  int32_t xpos;
+  int32_t ypos;
+  int32_t xoffset;
+  int32_t yoffset;
+  int32_t width;
+  int32_t height;
+  uint32_t flags;
+#define WCTK_WINDOW           0U
+#define WCTK_WINDOW_NOMAX    (1U<<0)
+#define WCTK_WINDOW_NOMIN    (1U<<1)
+#define WCTK_WINDOW_TOP      (1U<<2)
+#define WCTK_WINDOW_NORESIZE (1U<<3)
+  uint32_t state;
+#define WCTK_WINDOW_STATE_FOCUS     (1U<<0)
+#define WCTK_WINDOW_STATE_DISABLE   (1U<<1)
+#define WCTK_WINDOW_STATE_MAXIMIZE  (1U<<2)
   wctk_window_colors_t colors;
   pwctk_widget_t widget_list;
   pwctk_widget_t widget_focus;
-  uint uid;
+  uint32_t uid;
 }wctk_window_t, *pwctk_window_t;
 
 #define wctk_window_destroy(w) wctk_window_destroy_safe(&w)
 
 /*-----------------------------------------------------------------*/
-pwctk_window_t wctk_window_create (char* title, sint x, sint y,
-    sint w, sint h, uchar flags, uint uid);
+pwctk_window_t wctk_window_create (char* title, int32_t x, int32_t y,
+    int32_t w, int32_t h, uint8_t flags, uint32_t uid);
 void wctk_window_set_colors (pwctk_window_t window,
     pwctk_window_colors_t colors);
 void wctk_window_draw (pwctk_window_t window);
-void wctk_window_move (pwctk_window_t window, sint x, sint y);
-void wctk_window_resize (pwctk_window_t window, sint w, sint h);
-void wctk_window_set_focus (pwctk_window_t window, uchar b);
-uchar wctk_window_region_titlebar (pwctk_window_t window, sint x,
-    sint y);
-uchar wctk_window_region_bresize (pwctk_window_t window, sint x,
-    sint y);
-uchar wctk_window_region_bclose (pwctk_window_t window, sint x,
-    sint y);
+void wctk_window_move (pwctk_window_t window, int32_t x, int32_t y);
+void wctk_window_resize (pwctk_window_t window, int32_t w, int32_t h);
+void wctk_window_set_focus (pwctk_window_t window, uint8_t b);
+uint32_t wctk_window_get_state (pwctk_window_t window);
+void wctk_window_set_state (pwctk_window_t window, uint32_t state);
+void wctk_window_clr_state (pwctk_window_t window, uint32_t state);
+uint8_t wctk_window_region_titlebar (pwctk_window_t window, int32_t x,
+    int32_t y);
+uint8_t wctk_window_region_bresize (pwctk_window_t window, int32_t x,
+    int32_t y);
+uint8_t wctk_window_region_bclose (pwctk_window_t window, int32_t x,
+    int32_t y);
+uint8_t wctk_window_region_bmin (pwctk_window_t window, int32_t x,
+     int32_t y);
+uint8_t wctk_window_region_bmax (pwctk_window_t window, int32_t x,
+     int32_t y);
+int32_t wctk_window_get_width (pwctk_window_t window);
+int32_t wctk_window_get_height (pwctk_window_t window);
 void wctk_window_destroy_safe (pwctk_window_t *window);
 #define wctk_window_destroy(w) wctk_window_destroy_safe(&w)
 

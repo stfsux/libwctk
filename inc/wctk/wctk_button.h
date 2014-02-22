@@ -12,19 +12,19 @@ typedef struct _wctk_button_colors
 typedef struct _wctk_button
 {
   char *name;
-  sint xpos;
-  sint ypos;
-  sint width;
-  sint height;
-  uchar flags;
-  uchar state;
+  int32_t xpos;
+  int32_t ypos;
+  int32_t width;
+  int32_t height;
+  uint8_t flags;
+  uint8_t state;
 #define WCTK_BUTTON_STATE_FOCUS   (1<<0)
 #define WCTK_BUTTON_STATE_PRESS   (1<<1)
   wctk_button_colors_t colors;
   pwctk_window_t parent;
-  uchar reset;
-  uchar counter;
-  uint uid;
+  uint8_t reset;
+  uint8_t counter;
+  uint32_t uid;
 }wctk_button_t, *pwctk_button_t;
 
 #define WCTK_BUTTON_DRAWABLE(b)         ((b->xpos+2 < b->parent->width) &&\
@@ -40,14 +40,14 @@ typedef struct _wctk_button
 #define WCTK_BUTTON_HIT_TEST(b,x,y)     (WCTK_BUTTON_HIT_TESTX(b,x) &&\
                                            WCTK_BUTTON_HIT_TESTY(b,y))
 
-pwctk_button_t wctk_button_create (char *name, sint x, sint y, sint w, sint h,
-     uchar flags, pwctk_window_t parent, uint uid);
-void wctk_button_draw (pwctk_button_t btn, uint draw_area_width, uint draw_area_height);
+pwctk_button_t wctk_button_create (char *name, int32_t x, int32_t y, int32_t w, int32_t h,
+     uint8_t flags, pwctk_window_t parent, uint32_t uid);
+void wctk_button_draw (pwctk_button_t btn, uint32_t draw_area_width, uint32_t draw_area_height);
 void wctk_button_event_translate (pwctk_button_t btn, pwctk_event_t event);
-void wctk_button_set_state (pwctk_button_t btn, uchar b);
-void wctk_button_set_focus (pwctk_button_t btn, uchar b);
-void wctk_button_move (pwctk_button_t btn, sint x, sint y);
-void wctk_button_resize (pwctk_button_t btn, sint w, sint h);
+void wctk_button_set_state (pwctk_button_t btn, uint8_t b);
+void wctk_button_set_focus (pwctk_button_t btn, uint8_t b);
+void wctk_button_move (pwctk_button_t btn, int32_t x, int32_t y);
+void wctk_button_resize (pwctk_button_t btn, int32_t w, int32_t h);
 void wctk_button_destroy (pwctk_button_t btn);
 
 #define wbtn_t                      wctk_button_t

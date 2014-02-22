@@ -2,17 +2,18 @@
 #ifndef _WCTK_H_
 #define _WCTK_H_
 
+#include <stdint.h>
 #include <ncurses.h>
-#include <wctk/wctk_types.h>
 #include <wctk/wctk_str.h>
 #include <wctk/wctk_draw.h>
+#include <wctk/wctk_scrollbar.h>
 #include <wctk/wctk_window.h>
 #include <wctk/wctk_event.h>
 #include <wctk/wctk_mouse.h>
 #include <wctk/wctk_static_text.h>
 #include <wctk/wctk_button.h>
 #include <wctk/wctk_listview.h>
-#include <wctk/wctk_textview.h>
+#include <wctk/wctk_prompt.h>
 #include <wctk/wctk_widget.h>
 #include <wctk/wctk_stack.h>
 
@@ -80,11 +81,24 @@
 #define WCTKC_MAGENTA_WHITE     62
 #define WCTKC_CYAN_WHITE        63
 #define WCTKC_WHITE_WHITE       64
-#define WCTKC_MAX_PAIR          65
+#define WCTKC_BLACK_DEFAULT     65
+#define WCTKC_RED_DEFAULT       66
+#define WCTKC_GREEN_DEFAULT     67
+#define WCTKC_YELLOW_DEFAULT    68
+#define WCTKC_BLUE_DEFAULT      69
+#define WCTKC_MAGENTA_DEFAULT   70
+#define WCTKC_CYAN_DEFAULT      71
+#define WCTKC_WHITE_DEFAULT     72
+#define WCTKC_MAX_PAIR          73
 
 
-#define WCTK_SCREEN_WIDTH        (stdscr->_maxx)
-#define WCTK_SCREEN_HEIGHT       (stdscr->_maxy)
+#define WCTK_SCREEN_WIDTH        (getmaxx(stdscr))
+#define WCTK_SCREEN_HEIGHT       (getmaxy(stdscr))
+
+
+#ifndef KEY_RETURN
+#define KEY_RETURN 0x0000000D
+#endif
 
 void wctk_init (void);
 void wctk_setup_colors (void);

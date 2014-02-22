@@ -4,11 +4,11 @@
 
 /*-----------------------------------------------------------------*/
 void
- wctk_draw_rect (sint x, sint y,
-                 sint width, sint height,
+ wctk_draw_rect (int32_t x, int32_t y,
+                 int32_t width, int32_t height,
                  short pair)
 {
-  sint xpos, ypos;
+  int32_t xpos, ypos;
 
   if (x > WCTK_SCREEN_WIDTH  ||
       y > WCTK_SCREEN_HEIGHT ||
@@ -32,11 +32,11 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_draw_rect_fill (sint x, sint y,
-                      sint width, sint height,
+ wctk_draw_rect_fill (int32_t x, int32_t y,
+                      int32_t width, int32_t height,
                       chtype ch)
 {
-  sint xpos, ypos;
+  int32_t xpos, ypos;
   if (width  <= 0 ||
       height <= 0)
     return;
@@ -51,9 +51,9 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_draw_shadow (sint x, sint y, sint width, sint height)
+ wctk_draw_shadow (int32_t x, int32_t y, int32_t width, int32_t height)
 {
-  sint i;
+  int32_t i;
   short pair = 0;
   chtype ch = 0, newch = 0;
   for (i = 0; i < width; i++)
@@ -76,7 +76,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_draw_set_cpair (sint x, sint y, short cpair)
+ wctk_draw_set_cpair (int32_t x, int32_t y, short cpair)
 {
   chtype ch = 0;
   ch = mvinch (y, x);
@@ -86,7 +86,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_draw_cursor (sint x, sint y)
+ wctk_draw_cursor (int32_t x, int32_t y)
 {
   chtype c = 0;
   c = mvinch (y, x);
@@ -95,9 +95,9 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_draw_vline (sint x, sint y, sint l, short cpair)
+ wctk_draw_vline (int32_t x, int32_t y, int32_t l, short cpair)
 {
-  sint ypos;
+  int32_t ypos;
   if ( l < 0)
     return;
   for (ypos = y; ypos < (y+l); ypos++)
@@ -106,9 +106,9 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_draw_hline (sint x, sint y, sint l, short cpair)
+ wctk_draw_hline (int32_t x, int32_t y, int32_t l, short cpair)
 {
-  sint xpos;
+  int32_t xpos;
   if (l < 0)
     return;
   for (xpos = x; xpos < (x+l); xpos++)

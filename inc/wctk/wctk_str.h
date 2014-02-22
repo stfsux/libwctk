@@ -5,7 +5,7 @@
 /* Array of string(s).             */
 typedef struct _wctk_astr
 {
-  uint n;
+  uint32_t n;
   char **str;
 }wctk_astr_t, *pwctk_astr_t;
 

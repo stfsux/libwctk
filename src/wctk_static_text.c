@@ -3,14 +3,16 @@
 #include <string.h>
 #include "wctk/wctk.h"
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 pwctk_static_text_t
- wctk_static_text_create (char *txt, sint x, sint y, sint w, sint h,
-     pwctk_window_t parent)
+ wctk_static_text_create (char *txt, int32_t x, int32_t y,
+     int32_t width, int32_t height, pwctk_window_t parent)
 {
   pwctk_static_text_t st = NULL;
   
-  if (parent == NULL)
+  if (parent == NULL ||
+      width < 3 ||
+      height < 3)
     return NULL;
 
   st = calloc (1, sizeof(wctk_static_text_t));
@@ -19,8 +21,8 @@ pwctk_static_text_t
 
   st->xpos   = x + 1;
   st->ypos   = y + 1;
-  st->width  = w;
-  st->height = h;
+  st->width  = width;
+  st->height = height;
   st->parent = parent;
   st->default_cpair = parent->colors.default_cpair;
 
@@ -39,7 +41,7 @@ pwctk_static_text_t
   return st;
 }
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 void
  wctk_static_text_set (pwctk_static_text_t st, char* txt)
 {
@@ -54,13 +56,13 @@ void
   st->text[strlen(txt)] = 0;
 }
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 void
- wctk_static_text_draw (pwctk_static_text_t st, sint w,
-     sint h)
+ wctk_static_text_draw (pwctk_static_text_t st,
+     int32_t draw_area_width, int32_t draw_area_height)
 {
-  uint i;
-  sint y = 0, x = 0;
+  uint32_t i;
+  int32_t y = 0, x = 0;
 
   if (st == NULL)
     return;
@@ -71,23 +73,41 @@ void
     {
       x = 0;
       y++;
-      if (y >= h)
+      if (y >= draw_area_height)
         break;
       continue;
     }
-    if (x < w)
+    if (x < draw_area_width)
     {
       mvaddch (st->parent->ypos + st->ypos + y,
           st->parent->xpos + st->xpos + x,
           st->text[i] | COLOR_PAIR(st->default_cpair));
     }
+    else
+      continue;
     x++;
   }
 }
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 void
- wctk_static_text_move (pwctk_static_text_t st, sint x, sint y)
+ wctk_static_text_resize (pwctk_static_text_t st, int32_t width,
+     int32_t height)
+{
+  if (st == NULL)
+    return;
+
+  if (width < 3 ||
+      height < 3)
+    return;
+
+  st->width = width;
+  st->height = height;
+}
+
+/*------------------------------------------------------------------*/
+void
+ wctk_static_text_move (pwctk_static_text_t st, int32_t x, int32_t y)
 {
   if (x < 0 ||
       y < 0 ||
@@ -98,7 +118,7 @@ void
   st->ypos = y + 1;
 }
 
-/*-----------------------------------------------------------------*/
+/*------------------------------------------------------------------*/
 void
  wctk_static_text_destroy (pwctk_static_text_t st)
 {

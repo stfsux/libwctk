@@ -63,7 +63,7 @@ void
 void
  wctk_astr_destroy (pwctk_astr_t str)
 {
-  uint i;
+  uint32_t i;
   if (str != NULL)
   {
     if (str->str != NULL)

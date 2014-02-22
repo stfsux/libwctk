@@ -209,6 +209,8 @@ char phrack_issue1[] =
 "\n"
 "Be sure and get a copy of PHRACK INC., available on finer BBS/AE's everywhere.\n";
 
+
+/*
 wctk_textview_colors_t
  tv_colors = 
 {
@@ -218,6 +220,7 @@ wctk_textview_colors_t
   .focus_hline_cpair     = WCTKC_WHITE_RED,
   .focus_cursor_cpair    = WCTKC_RED_YELLOW
 };
+*/
 
 #define WINDOW_UID_MAIN         1
 #define WINDOW_UID_MAIN2        2
@@ -227,6 +230,7 @@ wctk_textview_colors_t
 
 char *event_type[] = 
 {
+  "WCTK_EVENT_NONE",
   "WCTK_EVENT_KEY",
   "WCTK_EVENT_MOUSE",
   "WCTK_EVENT_DRAG",
@@ -248,8 +252,8 @@ int
   pwctk_window_t window1 = NULL;
   pwctk_window_t window2 = NULL;
   pwctk_button_t btn[NBTN];
-  pwctk_textview_t textview1 = NULL;
-  pwctk_textview_t textview2 = NULL;
+  pwctk_static_text_t textview1 = NULL;
+  pwctk_static_text_t textview2 = NULL;
   pwctk_window_t window3 = NULL;
   pwctk_static_text_t statictxt = NULL;
   wctk_event_t ev;
@@ -269,10 +273,8 @@ int
       WINDOW_UID_MAIN2);
   window3 = wctk_window_create ("Last event", 20, 10, 40, 10, WCTK_WINDOW_TOP, 
       WINDOW_UID_EVENT);
-  textview1 = wctk_textview_create (phrack_intro, 0, 0, 28, 5, 0,
-      window1, WIDGET_UID_TEXTVIEW);
-  textview2 = wctk_textview_create (phrack_issue1, 0, 0, 28, 13, WCTK_TEXTVIEW_HILINE,
-      window2, WIDGET_UID_TEXTVIEW);
+  textview1 = wctk_static_text_create (phrack_intro, 0, 0, 50, 10, window1);
+  textview2 = wctk_static_text_create (phrack_issue1, 0, 0, 50, 10, window2);
   statictxt = wctk_static_text_create ("Wating a valid event...", 0, 0, 50, 10, window3);
 
   for (i = 0; i < NBTN; i++)
@@ -280,9 +282,6 @@ int
     sprintf (tmp, "Button %i", i);
     btn[i] = wctk_button_create (tmp, 1+i*12, 8, 10, 3, 0, window1, i+1);
   }
-
-  wctk_textview_set_colors (textview1, &tv_colors);
-  wctk_textview_set_colors (textview2, &tv_colors);
 
   gettimeofday (&s, NULL);
 
@@ -300,13 +299,13 @@ int
       case WCTK_EVENT_RESIZE:
         if (ev.window == window1)
         {
-          wctk_textview_resize (textview1, window1->width-2, window1->height-10);
+          wctk_static_text_resize (textview1, window1->width-2, window1->height-10);
           for (i = 0; i < NBTN; i++)
             wctk_button_move (btn[i], 1+i*12, textview1->height+3);
         }
         else if (ev.window == window2)
         {
-          wctk_textview_resize (textview2, window2->width-2, window2->height-2);
+          wctk_static_text_resize (textview2, window2->width-2, window2->height-2);
         }
         break;
     }
@@ -336,15 +335,15 @@ int
                          "Data:                0x%08X\n"
                          "Focused window:      %s\n"
                          "Focused widget type: %s",
-                         event_type[ev.type-1], ev.data, window->title,
-                         widget_type[window->widget_focus->type-1]);
+                         event_type[ev.type], ev.data, window->title,
+                         (window->widget_focus == NULL)?"None":widget_type[window->widget_focus->type-1]);
             break;
         }
         wctk_static_text_set (statictxt, evdesc);
       }
     }
     wctk_draw_rect_fill (0, 0, WCTK_SCREEN_WIDTH+1, WCTK_SCREEN_HEIGHT+1,
-        ACS_CKBOARD|COLOR_PAIR(WCTKC_BLUE_WHITE));
+        ACS_CKBOARD|COLOR_PAIR(WCTKC_WHITE_DEFAULT));
     wctk_refresh ();
   }
 

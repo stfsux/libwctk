@@ -127,16 +127,16 @@ void
 
 /*-----------------------------------------------------------------*/
 pwctk_zorder_t
- wctk_zorder_get (sint x, sint y)
+ wctk_zorder_get (int32_t x, int32_t y)
 {
   pwctk_zorder_t ret = NULL;
   pwctk_zorder_t n = _g_wctk_first;
   while (n != NULL)
   {
     if (x >= (n->window->xpos)                         &&
-        x <= (n->window->xpos+(sint)n->window->width)  &&
+        x <= (n->window->xpos+(int32_t)n->window->width)  &&
         y >= (n->window->ypos)                         &&
-        y <= (n->window->ypos+(sint)n->window->height))
+        y <= (n->window->ypos+(int32_t)n->window->height))
     {
       ret = n;
       break;

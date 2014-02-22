@@ -5,8 +5,8 @@
 
 /*-----------------------------------------------------------------*/
 pwctk_button_t
- wctk_button_create (char *name, sint x, sint y, sint w, sint h,
-     uchar flags, pwctk_window_t parent, uint uid)
+ wctk_button_create (char *name, int32_t x, int32_t y, int32_t w, int32_t h,
+     uint8_t flags, pwctk_window_t parent, uint32_t uid)
 {
   pwctk_button_t btn = NULL;
   
@@ -48,13 +48,13 @@ pwctk_button_t
 
 /*-----------------------------------------------------------------*/
 void
- wctk_button_draw (pwctk_button_t btn, uint draw_area_width,
-     uint draw_area_height)
+ wctk_button_draw (pwctk_button_t btn, uint32_t draw_area_width,
+     uint32_t draw_area_height)
 {
-  uint xpos_name = 0, ypos_name = 0;
-  uint i = 0;
+  uint32_t xpos_name = 0, ypos_name = 0;
+  uint32_t i = 0;
 
-  if (strlen(btn->name) >= (uint)btn->width)
+  if (strlen(btn->name) >= (uint32_t)btn->width)
     xpos_name = btn->parent->xpos + btn->xpos;
   else
     xpos_name = btn->parent->xpos + btn->xpos +
@@ -205,7 +205,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_button_set_state (pwctk_button_t btn, uchar b)
+ wctk_button_set_state (pwctk_button_t btn, uint8_t b)
 {
   if (b)
     btn->state = btn->state | WCTK_BUTTON_STATE_PRESS;
@@ -215,7 +215,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_button_set_focus (pwctk_button_t btn, uchar b)
+ wctk_button_set_focus (pwctk_button_t btn, uint8_t b)
 {
   if (b)
     btn->state = btn->state | WCTK_BUTTON_STATE_FOCUS;
@@ -228,7 +228,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_button_move (pwctk_button_t btn, sint x, sint y)
+ wctk_button_move (pwctk_button_t btn, int32_t x, int32_t y)
 {
   if (btn != NULL)
   {
@@ -239,7 +239,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_button_resize (pwctk_button_t btn, sint w, sint h)
+ wctk_button_resize (pwctk_button_t btn, int32_t w, int32_t h)
 {
   if (btn == NULL ||
       w <= 1      ||

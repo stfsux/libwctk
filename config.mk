@@ -23,5 +23,4 @@ SRC_FILES = $(wildcard $(SRCDIR)/*.c)
 HDR_FILES = $(wildcard $(INCDIR)/*.h)
 OBJ_FILES = $(SRC_FILES:.c=.o)
 
-CFLAGS		= -g -Wall -Wshadow -Wextra -Wmissing-prototypes -Wstrict-prototypes -I./$(INCDIR) -I/usr/local/include -I/usr/include 
-
+CFLAGS		= -g -Wall -Wshadow -Wextra -Wmissing-prototypes -Wstrict-prototypes -I./$(INCDIR) -I/usr/local/include -I/usr/include -std=c99 
