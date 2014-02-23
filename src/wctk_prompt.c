@@ -41,7 +41,7 @@ pwctk_prompt_t
 }
 
 void
- wctk_prompt_set_focus (pwctk_prompt_t prompt, uint8_t b)
+ wctk_prompt_focus_set (pwctk_prompt_t prompt, uint8_t b)
 {
   if (prompt == NULL)
     return;

@@ -11,7 +11,7 @@ void wctk_widget_attach (pwctk_window_t parent, void *widget, uint32_t type);
 void wctk_widget_draw (pwctk_window_t parent);
 void wctk_widget_event_translate_all (pwctk_window_t parent, pwctk_event_t event);
 void wctk_widget_event_translate (pwctk_window_t parent, pwctk_event_t event);
-void wctk_widget_set_focus (pwctk_widget_t widget, uint8_t b);
+void wctk_widget_focus_set (pwctk_widget_t widget, uint8_t b);
 uint8_t wctk_widget_focus_next (pwctk_window_t window);
 void wctk_widget_focus_first (pwctk_window_t window);
 /* uint8_t wctk_widget_hit (pwctk_widget_t widget, int32_t x, int32_t y); */

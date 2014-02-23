@@ -50,7 +50,7 @@ void
       event->type != WCTK_EVENT_RESIZE)
     memset (event, 0x00, sizeof(wctk_event_t));
   event->window = wctk_zorder_get_first_window ();
-  wctk_window_set_focus (event->window, 1);
+  wctk_window_focus_set (event->window, 1);
   key = wgetch (stdscr);
   switch (key)
   {
@@ -115,7 +115,7 @@ void
             if (zwin != wctk_zorder_get_first ())
             {
               pwctk_window_t win = zwin->window;
-              wctk_window_set_focus (wctk_zorder_get_first_window (), 0);
+              wctk_window_focus_set (wctk_zorder_get_first_window (), 0);
               wctk_zorder_pop_target (zwin);
               wctk_zorder_push (win);
               event->window = wctk_zorder_get_first_window ();
@@ -197,7 +197,7 @@ void
     case WCTK_EVENT_CLOSE:
       if (event->window != NULL)
       {
-        wctk_window_set_focus (event->window, 0);
+        wctk_window_focus_set (event->window, 0);
         wctk_zorder_pop ();
         event->window = wctk_zorder_get_first_window ();
       }
@@ -206,17 +206,17 @@ void
     case WCTK_EVENT_MAXIMIZE:
       if (event->window != NULL)
       {
-        if (!(wctk_window_get_state(event->window)&WCTK_WINDOW_STATE_MAXIMIZE))
+        if (!(wctk_window_state_get(event->window)&WCTK_WINDOW_STATE_MAXIMIZE))
         {
           wctk_window_resize (event->window, getmaxx(stdscr), getmaxy(stdscr));
           wctk_window_move (event->window, 0, 0);
-          wctk_window_set_state (event->window, WCTK_WINDOW_STATE_MAXIMIZE);
+          wctk_window_state_set (event->window, WCTK_WINDOW_STATE_MAXIMIZE);
         }
         else
         {
           wctk_window_resize (event->window, 40, 10);
           wctk_window_move (event->window, 20, 5);
-          wctk_window_clr_state (event->window, WCTK_WINDOW_STATE_MAXIMIZE);
+          wctk_window_state_clr (event->window, WCTK_WINDOW_STATE_MAXIMIZE);
         }
       }
       break;
@@ -233,7 +233,7 @@ void
               if (win != NULL)
               {
                 wctk_widget_focus_first (win);
-                wctk_window_set_focus (win, 0);
+                wctk_window_focus_set (win, 0);
                 wctk_zorder_switch_next_window ();
               }
             }

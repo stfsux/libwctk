@@ -11,9 +11,16 @@ pwctk_listview_t
 {
   pwctk_listview_t lv = NULL;
 
-  if (width <= 2     ||
-      height <= 2    ||
-      parent == NULL)
+  if (parent == NULL)
+    return NULL;
+
+  if (width == WCTK_LISTVIEW_MAXWIDTH)
+    width = parent->width;
+
+  if (height == WCTK_LISTVIEW_MAXHEIGHT)
+    height = parent->height-1;
+
+  if (width <= 2 || height <= 2)
     return NULL;
 
   lv = calloc (1, sizeof(wctk_listview_t));
@@ -46,6 +53,17 @@ pwctk_listview_t
 
 /*------------------------------------------------------------------*/
 void
+ wctk_listview_colors_set (pwctk_listview_t lv,
+     pwctk_listview_colors_t colors)
+{
+  if (lv == NULL || colors == NULL)
+    return;
+
+  memcpy (&lv->colors, colors, sizeof(wctk_listview_colors_t));
+}
+
+/*------------------------------------------------------------------*/
+void
  wctk_listview_resize (pwctk_listview_t lv, int32_t width, int32_t height)
 {
   if (lv == NULL)
@@ -59,7 +77,7 @@ void
 
 /*------------------------------------------------------------------*/
 uint8_t
- wctk_listview_add_item (pwctk_listview_t lv, char *item)
+ wctk_listview_item_add (pwctk_listview_t lv, char *item)
 {
   pwctk_listview_item_t lv_item = NULL;
   if (lv == NULL ||
@@ -85,7 +103,7 @@ uint8_t
     lv->start = lv_item;
   }
   else
-    wctk_listview_item_add_queue (lv, lv_item);
+    wctk_listview_item_queue_add (lv, lv_item);
 
   if (lv->flags&WCTK_LISTVIEW_AUTOSCROLL)
     wctk_listview_item_hl_next (lv);
@@ -95,7 +113,7 @@ uint8_t
 
 /*------------------------------------------------------------------*/
 uint8_t
- wctk_listview_item_add_queue (pwctk_listview_t lv,
+ wctk_listview_item_queue_add (pwctk_listview_t lv,
      pwctk_listview_item_t item)
 {
   pwctk_listview_item_t old_queue = NULL;
@@ -117,7 +135,7 @@ uint8_t
  
 /*------------------------------------------------------------------*/
 pwctk_listview_item_t
- wctk_listview_item_get_bottom (pwctk_listview_t lv)
+ wctk_listview_item_bottom_get (pwctk_listview_t lv)
 {
   pwctk_listview_item_t item = NULL;
   int32_t i;
@@ -145,12 +163,15 @@ void
   if (lv == NULL)
     return;
 
+  if (lv->start == NULL)
+    return;
+
   if (lv->current_item+1 != lv->height &&
       lv->current_item + lv->start_item < lv->nitems)
     lv->current_item++;
   else
   {
-    if (lv->queue != wctk_listview_item_get_bottom (lv))
+    if (lv->queue != wctk_listview_item_bottom_get (lv))
     {
       lv->start = lv->start->next;
       lv->start_item++;
@@ -163,6 +184,9 @@ void
  wctk_listview_item_hl_prev (pwctk_listview_t lv)
 {
   if (lv == NULL)
+    return;
+
+  if (lv->start == NULL)
     return;
   
   if (lv->current_item != 0)
@@ -185,18 +209,20 @@ void
   pwctk_listview_item_t item = NULL;
   int32_t i, j;
   uint32_t id = 0;
+  short hcpair = 0;
 
   if (lv == NULL)
     return;
 
+  if (lv->state&WCTK_LISTVIEW_STATE_FOCUS)
+    hcpair = lv->colors.focus_hline_cpair;
+  else
+    hcpair = lv->colors.default_hline_cpair;
 
   /* Draw background of the listview. */
   wctk_draw_rect_fill (wctk_listview_xscreen(lv),
       wctk_listview_yscreen(lv), draw_area_width,
       draw_area_height, ' '|COLOR_PAIR(lv->colors.default_cpair));
-
-  if (lv->current_item >= draw_area_height)
-    lv->current_item = draw_area_height-1;
 
   /* Draw each item from the linked list starting with    */
   /* the member "start" of the wctk_listview_t structure. */
@@ -215,7 +241,7 @@ void
     {
       wctk_draw_rect_fill (wctk_listview_xscreen(lv),
           wctk_listview_yscreen(lv) + i, draw_area_width,
-          1, ' '|COLOR_PAIR(lv->colors.focus_hline_cpair));
+          1, ' '|COLOR_PAIR(hcpair));
       id = item->id;
     }
 
@@ -227,7 +253,7 @@ void
       {
         mvaddch (wctk_listview_yscreen(lv) + i,
             wctk_listview_xscreen(lv) + j,
-            item->item[j]|COLOR_PAIR(lv->colors.focus_hline_cpair));
+            item->item[j]|COLOR_PAIR(hcpair));
       }
       else
       {
@@ -241,8 +267,8 @@ void
   }
 
   if (lv->flags&WCTK_LISTVIEW_SCROLLBAR)
-    wctk_scrollbar_vertical_draw (lv->parent->xpos + lv->xpos + draw_area_width,
-        wctk_listview_yscreen(lv), draw_area_height, lv->nitems, id);
+    wctk_scrollbar_vertical_draw (lv->parent->xpos + lv->xpos + lv->width,
+        wctk_listview_yscreen(lv), lv->height, lv->nitems, id);
 }
 
 /*------------------------------------------------------------------*/
@@ -273,7 +299,7 @@ void
 
 /*------------------------------------------------------------------*/
 void
- wctk_listview_set_focus (pwctk_listview_t lv, uint8_t b)
+ wctk_listview_focus_set (pwctk_listview_t lv, uint8_t b)
 {
   if (lv == NULL)
     return;
@@ -286,7 +312,7 @@ void
 
 /*------------------------------------------------------------------*/
 uint8_t
- wctk_listview_item_remove_queue (pwctk_listview_t lv)
+ wctk_listview_item_queue_remove (pwctk_listview_t lv)
 {
   pwctk_listview_item_t prev_item = NULL;
   if (lv == NULL)
@@ -325,7 +351,7 @@ void
     return;
 
   if (lv->queue != NULL)
-    while (wctk_listview_item_remove_queue (lv));
+    while (wctk_listview_item_queue_remove (lv));
 
   free (lv);
 }

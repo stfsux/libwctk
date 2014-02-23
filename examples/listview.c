@@ -27,7 +27,7 @@ int
   {
     char tmp[256];
     sprintf (tmp, "0x%08X hello world!", 0x08040000+i);
-    wctk_listview_add_item (lv, tmp);
+    wctk_listview_item_add (lv, tmp);
   }
 
   while (run)

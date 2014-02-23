@@ -155,7 +155,7 @@ void
     {
       btn->counter = 0;
       btn->reset = 0;
-      wctk_button_set_state (btn, 0);
+      wctk_button_state_set (btn, 0);
     }
   }
 }
@@ -179,14 +179,14 @@ void
             event->mevent.y >= btn->parent->ypos + btn->ypos               &&
             event->mevent.y <= btn->parent->ypos + btn->ypos + btn->height)
         {
-          wctk_button_set_state (btn, 1);
+          wctk_button_state_set (btn, 1);
           event->type = WCTK_EVENT_BUTTON;
           event->data = btn->uid;
         }
       }
       if (wctk_mouse_released (event))
       {
-        wctk_button_set_state (btn, 0);
+        wctk_button_state_set (btn, 0);
       }
       break;
 
@@ -194,7 +194,7 @@ void
       if (event->data == ' '  ||
           event->data == '\r')
       {
-        wctk_button_set_state (btn, 1);
+        wctk_button_state_set (btn, 1);
         btn->reset = 1;
         event->type = WCTK_EVENT_BUTTON;
         event->data = btn->uid;
@@ -205,7 +205,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_button_set_state (pwctk_button_t btn, uint8_t b)
+ wctk_button_state_set (pwctk_button_t btn, uint8_t b)
 {
   if (b)
     btn->state = btn->state | WCTK_BUTTON_STATE_PRESS;
@@ -215,7 +215,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_button_set_focus (pwctk_button_t btn, uint8_t b)
+ wctk_button_focus_set (pwctk_button_t btn, uint8_t b)
 {
   if (b)
     btn->state = btn->state | WCTK_BUTTON_STATE_FOCUS;

@@ -60,6 +60,7 @@ void
   if (window == NULL)
     return;
   /* Draw title bar. */
+  /* Set color attribute */
   if (window->state&WCTK_WINDOW_STATE_FOCUS)
   {
     wctk_draw_rect_fill (window->xpos, window->ypos, window->width, 1,
@@ -72,23 +73,15 @@ void
       ' '|COLOR_PAIR(window->colors.titlebar_cpair));
     attr_on (COLOR_PAIR(window->colors.titlebar_cpair), NULL);
   }
+  /* Draw title. */
+  attr_on (A_BOLD, NULL);
+  /* Draw a line into the title bar. */
+  if (window->flags&WCTK_WINDOW_TITLEBAR_LINE)
+    mvhline (window->ypos, window->xpos, ACS_HLINE, window->width);
   mvprintw (window->ypos, window->xpos+1, "%s", window->title);
-  /*
-  if ((window->flags&WCTK_WINDOW_NOMAX) &&
-      !(window->flags&WCTK_WINDOW_NOMIN))
-    mvprintw (window->ypos, window->xpos + window->width - 6,
-        "[_]");
-  else if (!(window->flags&WCTK_WINDOW_NOMAX) &&
-      (window->flags&WCTK_WINDOW_NOMIN))
-    mvprintw (window->ypos, window->xpos + window->width - 6,
-        "[o]");
-  else if (!(window->flags&WCTK_WINDOW_NOMAX) &&
-      !(window->flags&WCTK_WINDOW_NOMIN))
-    mvprintw (window->ypos, window->xpos + window->width - 9,
-        "[_][o]");
-  mvprintw (window->ypos, window->xpos + window->width - 3,
-      "[x]");
-      */
+  attr_off (A_BOLD, NULL);
+
+  /* Reset color attribute. */
   if (window->state&WCTK_WINDOW_STATE_FOCUS)
     attr_off (COLOR_PAIR(window->colors.focused_cpair), NULL);
   else
@@ -98,26 +91,12 @@ void
   wctk_draw_rect_fill (window->xpos, window->ypos+1, window->width,
     window->height-1, ' '|COLOR_PAIR(window->colors.default_cpair));
 
-  /* Draw vertical and horizontal lines. */
-  /*
-  wctk_draw_vline (window->xpos, window->ypos+1, window->height-1, window->colors.default_cpair);
-  wctk_draw_vline (window->xpos+window->width-1, window->ypos+1, window->height-2, window->colors.default_cpair);
-  wctk_draw_hline (window->xpos, window->ypos+window->height-1, window->width-1, window->colors.default_cpair);
-  */
-
   /* Draw widgets. */
   wctk_widget_draw (window);
   
-  /* Draw corners. */
-  /*
-  mvaddch (window->ypos+window->height-1, window->xpos+window->width-1,
-      ACS_LRCORNER|COLOR_PAIR(window->colors.default_cpair));
-  mvaddch (window->ypos+window->height-1, window->xpos,
-      ACS_LLCORNER|COLOR_PAIR(window->colors.default_cpair));
-      */
-
   /* Drop shadow. */
-  wctk_draw_shadow (window->xpos, window->ypos, window->width, window->height);
+  if (!(window->flags&WCTK_WINDOW_NOSHADOW))
+    wctk_draw_shadow (window->xpos, window->ypos, window->width, window->height);
 }
 
 /*-----------------------------------------------------------------*/
@@ -146,26 +125,26 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_window_set_focus (pwctk_window_t window, uint8_t b)
+ wctk_window_focus_set (pwctk_window_t window, uint8_t b)
 {
   if (window != NULL)
   {
     if (b)
     {
       window->state = window->state | WCTK_WINDOW_STATE_FOCUS;
-      wctk_widget_set_focus (window->widget_focus, 1);
+      wctk_widget_focus_set (window->widget_focus, 1);
     }
     else
     {
       window->state = window->state & (~WCTK_WINDOW_STATE_FOCUS);
-      wctk_widget_set_focus (window->widget_focus, 0);
+      wctk_widget_focus_set (window->widget_focus, 0);
     }
   }
 }
 
 /*-----------------------------------------------------------------*/
 uint32_t
- wctk_window_get_state (pwctk_window_t window)
+ wctk_window_state_get (pwctk_window_t window)
 {
   if (window == NULL)
     return 0;
@@ -174,7 +153,7 @@ uint32_t
 
 /*-----------------------------------------------------------------*/
 void
- wctk_window_set_state (pwctk_window_t window, uint32_t state)
+ wctk_window_state_set (pwctk_window_t window, uint32_t state)
 {
   if (window == NULL)
     return;
@@ -184,7 +163,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_window_clr_state (pwctk_window_t window, uint32_t state)
+ wctk_window_state_clr (pwctk_window_t window, uint32_t state)
 {
   if (window == NULL)
     return;
@@ -275,7 +254,7 @@ uint8_t
 
 /*-----------------------------------------------------------------*/
 int32_t
- wctk_window_get_width (pwctk_window_t window)
+ wctk_window_width_get (pwctk_window_t window)
 {
   if (window == NULL)
     return 0;
@@ -284,7 +263,7 @@ int32_t
 
 /*-----------------------------------------------------------------*/
 int32_t
- wctk_window_get_height (pwctk_window_t window)
+ wctk_window_height_get (pwctk_window_t window)
 {
   if (window == NULL)
     return 0;

@@ -69,7 +69,7 @@ void
 
   for (i = 0; (i < strlen(st->text)); i++)
   {
-    if (st->text[i] == '\n')
+    if (st->text[i] == '\n' || x >= draw_area_width)
     {
       x = 0;
       y++;
@@ -77,14 +77,9 @@ void
         break;
       continue;
     }
-    if (x < draw_area_width)
-    {
-      mvaddch (st->parent->ypos + st->ypos + y,
-          st->parent->xpos + st->xpos + x,
-          st->text[i] | COLOR_PAIR(st->default_cpair));
-    }
-    else
-      continue;
+    mvaddch (st->parent->ypos + st->ypos + y,
+        st->parent->xpos + st->xpos + x,
+        st->text[i] | COLOR_PAIR(st->default_cpair));
     x++;
   }
 }

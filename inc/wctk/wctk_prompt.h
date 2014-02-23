@@ -44,7 +44,7 @@ typedef struct _wctk_prompt
 
 pwctk_prompt_t wctk_prompt_create (int32_t x, int32_t y, int32_t width, int32_t height,
      uint32_t flags, pwctk_window_t parent, uint32_t uid);
-void wctk_prompt_set_focus (pwctk_prompt_t prompt, uint8_t b);
+void wctk_prompt_focus_set (pwctk_prompt_t prompt, uint8_t b);
 void wctk_prompt_draw (pwctk_prompt_t prompt, int32_t draw_area_width);
 void wctk_prompt_event_translate (pwctk_prompt_t prompt, pwctk_event_t event);
 void wctk_prompt_add_char (pwctk_prompt_t prompt, char c);

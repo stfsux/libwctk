@@ -31,11 +31,13 @@ typedef struct _wctk_window
   int32_t width;
   int32_t height;
   uint32_t flags;
-#define WCTK_WINDOW           0U
-#define WCTK_WINDOW_NOMAX    (1U<<0)
-#define WCTK_WINDOW_NOMIN    (1U<<1)
-#define WCTK_WINDOW_TOP      (1U<<2)
-#define WCTK_WINDOW_NORESIZE (1U<<3)
+#define WCTK_WINDOW               0U
+#define WCTK_WINDOW_NOMAX         (1U<<0)
+#define WCTK_WINDOW_NOMIN         (1U<<1)
+#define WCTK_WINDOW_TOP           (1U<<2)
+#define WCTK_WINDOW_NORESIZE      (1U<<3)
+#define WCTK_WINDOW_NOSHADOW      (1U<<4)
+#define WCTK_WINDOW_TITLEBAR_LINE (1U<<5)
   uint32_t state;
 #define WCTK_WINDOW_STATE_FOCUS     (1U<<0)
 #define WCTK_WINDOW_STATE_DISABLE   (1U<<1)
@@ -56,10 +58,10 @@ void wctk_window_set_colors (pwctk_window_t window,
 void wctk_window_draw (pwctk_window_t window);
 void wctk_window_move (pwctk_window_t window, int32_t x, int32_t y);
 void wctk_window_resize (pwctk_window_t window, int32_t w, int32_t h);
-void wctk_window_set_focus (pwctk_window_t window, uint8_t b);
-uint32_t wctk_window_get_state (pwctk_window_t window);
-void wctk_window_set_state (pwctk_window_t window, uint32_t state);
-void wctk_window_clr_state (pwctk_window_t window, uint32_t state);
+void wctk_window_focus_set (pwctk_window_t window, uint8_t b);
+uint32_t wctk_window_state_get (pwctk_window_t window);
+void wctk_window_state_set (pwctk_window_t window, uint32_t state);
+void wctk_window_state_clr (pwctk_window_t window, uint32_t state);
 uint8_t wctk_window_region_titlebar (pwctk_window_t window, int32_t x,
     int32_t y);
 uint8_t wctk_window_region_bresize (pwctk_window_t window, int32_t x,
@@ -70,8 +72,8 @@ uint8_t wctk_window_region_bmin (pwctk_window_t window, int32_t x,
      int32_t y);
 uint8_t wctk_window_region_bmax (pwctk_window_t window, int32_t x,
      int32_t y);
-int32_t wctk_window_get_width (pwctk_window_t window);
-int32_t wctk_window_get_height (pwctk_window_t window);
+int32_t wctk_window_width_get (pwctk_window_t window);
+int32_t wctk_window_height_get (pwctk_window_t window);
 void wctk_window_destroy_safe (pwctk_window_t *window);
 #define wctk_window_destroy(w) wctk_window_destroy_safe(&w)
 
@@ -85,7 +87,7 @@ void wctk_window_destroy_safe (pwctk_window_t *window);
 #define wwin_draw(w)                wctk_window_draw(w)
 #define wwin_move(w,x,y)            wctk_window_move(w,x,y)
 #define wwin_resize(w,wd,h)         wctk_window_resize(w,wd,h)
-#define wwin_set_focus(w,b)         wctk_window_set_focus(w,b)
+#define wwin_focus_set(w,b)         wctk_window_focus_set(w,b)
 #define wwin_region_titlebar(w,x,y) wctk_window_region_titlebar(w,x,y)
 #define wwin_region_bclose(w,x,y)   wctk_window_region_bclose(w,x,y)
 #define wwin_destroy(w)             wctk_window_destroy(w)

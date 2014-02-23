@@ -125,7 +125,7 @@ void
 
 /*-----------------------------------------------------------------*/
 void
- wctk_widget_set_focus (pwctk_widget_t widget, uint8_t b)
+ wctk_widget_focus_set (pwctk_widget_t widget, uint8_t b)
 {
   if (widget == NULL)
     return;
@@ -133,19 +133,19 @@ void
   switch (widget->type)
   {
     case WCTKW_LISTVIEW:
-      wctk_listview_set_focus (
+      wctk_listview_focus_set (
           WCTK_WIDGET_LISTVIEW(widget->widget), b
           );
       break;
 
     case WCTKW_BUTTON:
-      wctk_button_set_focus (
+      wctk_button_focus_set (
           WCTK_WIDGET_BUTTON(widget->widget), b
           );
       break;
 
     case WCTKW_PROMPT:
-      wctk_prompt_set_focus (
+      wctk_prompt_focus_set (
           WCTK_WIDGET_PROMPT(widget->widget), b
           );
       break;
@@ -166,7 +166,7 @@ uint8_t
 
   widget = window->widget_focus;
 
-  wctk_widget_set_focus (widget, 0);
+  wctk_widget_focus_set (widget, 0);
 
   widget = widget->next;
 
@@ -175,7 +175,7 @@ uint8_t
     if (widget->type != WCTKW_STATICTEXT)
     {
       window->widget_focus = widget;
-      wctk_widget_set_focus (window->widget_focus, 1);
+      wctk_widget_focus_set (window->widget_focus, 1);
       return 1;
     }
     widget = widget->next;
@@ -190,7 +190,7 @@ void
   pwctk_widget_t widget = NULL;
   if (window == NULL)
     return;
-  wctk_widget_set_focus (window->widget_focus, 0);
+  wctk_widget_focus_set (window->widget_focus, 0);
   widget = window->widget_list;
   window->widget_focus = NULL;
   while (widget != NULL)
@@ -202,7 +202,7 @@ void
     }
     widget = widget->next;
   }
-  wctk_widget_set_focus (window->widget_focus, 1);
+  wctk_widget_focus_set (window->widget_focus, 1);
 }
 
 /*-----------------------------------------------------------------*/

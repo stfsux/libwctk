@@ -71,7 +71,7 @@ void
       {
         if (wctk_window_region_titlebar (event->window,
               _g_wctk_xmouse, _g_wctk_ymouse) &&
-            !(wctk_window_get_state (event->window)&WCTK_WINDOW_STATE_MAXIMIZE))
+            !(wctk_window_state_get (event->window)&WCTK_WINDOW_STATE_MAXIMIZE))
         {
           _g_wctk_drag = 1;
           _g_wctk_click_sx = _g_wctk_xmouse - event->window->xpos;

@@ -44,8 +44,8 @@ pwctk_button_t wctk_button_create (char *name, int32_t x, int32_t y, int32_t w, 
      uint8_t flags, pwctk_window_t parent, uint32_t uid);
 void wctk_button_draw (pwctk_button_t btn, uint32_t draw_area_width, uint32_t draw_area_height);
 void wctk_button_event_translate (pwctk_button_t btn, pwctk_event_t event);
-void wctk_button_set_state (pwctk_button_t btn, uint8_t b);
-void wctk_button_set_focus (pwctk_button_t btn, uint8_t b);
+void wctk_button_state_set (pwctk_button_t btn, uint8_t b);
+void wctk_button_focus_set (pwctk_button_t btn, uint8_t b);
 void wctk_button_move (pwctk_button_t btn, int32_t x, int32_t y);
 void wctk_button_resize (pwctk_button_t btn, int32_t w, int32_t h);
 void wctk_button_destroy (pwctk_button_t btn);
@@ -54,8 +54,8 @@ void wctk_button_destroy (pwctk_button_t btn);
 #define pwbtn_t                     pwctk_button_t
 #define wbtn_create(n,x,y,w,h,f,p)  wctk_button_create(n,x,y,w,h,f,p)
 #define wbtn_draw(b,w,h)            wctk_button_draw(b,w,h)
-#define wbtn_set_state(b,bl)        wctk_button_set_state(b,bl)
-#define wbtn_set_focus(b,bl)        wctk_button_set_focus(b,bl)
+#define wbtn_state_set(b,bl)        wctk_button_state_set(b,bl)
+#define wbtn_focus_set(b,bl)        wctk_button_focus_set(b,bl)
 #define wbtn_move(b,x,y)            wctk_button_move(b,x,y)
 #define wbtn_resize(b,w,h)          wctk_button_resize(b,w,h)
 #define wbtn_destroy(b)             wctk_button_destroy(b)
